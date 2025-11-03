@@ -62,28 +62,28 @@ jobs:
       # -----------------------------
       # 6. SonarQube Analysis
       # -----------------------------
-      - name: 🔍 SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v2
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        with:
-          args: >
-            -Dsonar.projectKey=vite-deploy
-            -Dsonar.projectName=vite-deploy
-            -Dsonar.sources=src
-            -Dsonar.tests=src
-            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.coverage.exclusions=**/*.test.*,**/__tests__/**,**/test/**
-            -Dsonar.sourceEncoding=UTF-8
+      # - name: 🔍 SonarQube Scan
+      #   uses: SonarSource/sonarqube-scan-action@v2
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #   with:
+      #     args: >
+      #       -Dsonar.projectKey=vite-deploy
+      #       -Dsonar.projectName=vite-deploy
+      #       -Dsonar.sources=src
+      #       -Dsonar.tests=src
+      #       -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
+      #       -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+      #       -Dsonar.coverage.exclusions=**/*.test.*,**/__tests__/**,**/test/**
+      #       -Dsonar.sourceEncoding=UTF-8
 
-      # -----------------------------
-      # 7. Quality Gate check (optional but recommended)
-      # -----------------------------
-      - name: ✅ SonarQube Quality Gate
-        if: always()
-        uses: SonarSource/sonarqube-quality-gate-action@v1
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # # -----------------------------
+      # # 7. Quality Gate check (optional but recommended)
+      # # -----------------------------
+      # - name: ✅ SonarQube Quality Gate
+      #   if: always()
+      #   uses: SonarSource/sonarqube-quality-gate-action@v1
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

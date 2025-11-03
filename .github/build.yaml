@@ -10,7 +10,7 @@ permissions:
   packages: write
 
 env:
-  IMAGE_NAME: your-dockerhub-username/your-app-name
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/taskify
 
 jobs:
   build-and-push:

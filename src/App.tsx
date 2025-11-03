@@ -15,6 +15,8 @@ import {
   AlertCircle,
 } from "lucide-react";
 
+import { toast } from "./lib/toast";
+
 interface Task {
   id: string;
   title: string;
@@ -66,6 +68,7 @@ export default function App() {
         createdAt: new Date().toISOString().split("T")[0],
       };
       setTasks([newTask, ...tasks]);
+      toast.success("Task added successfully.");
       setTitle("");
       setDescription("");
       setDueDate("");
@@ -83,7 +86,13 @@ export default function App() {
   };
 
   const deleteTask = (id: string) => {
+    const taskToDelete = tasks.find((task) => task.id === id);
+    if (!taskToDelete) {
+      toast.error("Task not found.");
+      return;
+    }
     setTasks(tasks.filter((task) => task.id !== id));
+    toast.success("Task deleted successfully.");
   };
 
   const completedCount = tasks.filter((t) => t.completed).length;
