@@ -22,17 +22,11 @@ jobs:
       - name: 🛎️ Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Required for full Sonar blame info
+          fetch-depth: 0
 
       # -----------------------------
-      # 2. Setup Node.js & pnpm
+      # 2. Setup pnpm
       # -----------------------------
-      - name: ⚙️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: pnpm
-
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v3
         with:
@@ -40,13 +34,22 @@ jobs:
           run_install: false
 
       # -----------------------------
-      # 3. Install dependencies (cached)
+      # 3. Setup Node.js (after pnpm)
+      # -----------------------------
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      # -----------------------------
+      # 4. Install dependencies
       # -----------------------------
       - name: 📥 Install dependencies
         run: pnpm install --frozen-lockfile
 
       # -----------------------------
-      # 4. Run Vitest with coverage
+      # 5. Run Vitest with coverage
       # -----------------------------
       - name: 🧪 Run Vitest tests
         run: pnpm vitest run --coverage
@@ -54,13 +57,13 @@ jobs:
           CI: true
 
       # -----------------------------
-      # 5. Build project
+      # 6. Build project
       # -----------------------------
       - name: 🏗️ Build project
         run: pnpm build
 
       # -----------------------------
-      # 6. SonarQube Analysis
+      # 7. SonarQube Analysis
       # -----------------------------
       # - name: 🔍 SonarQube Scan
       #   uses: SonarSource/sonarqube-scan-action@v2
@@ -78,9 +81,9 @@ jobs:
       #       -Dsonar.coverage.exclusions=**/*.test.*,**/__tests__/**,**/test/**
       #       -Dsonar.sourceEncoding=UTF-8
 
-      # # -----------------------------
-      # # 7. Quality Gate check (optional but recommended)
-      # # -----------------------------
+      # -----------------------------
+      # 8. Quality Gate check (optional)
+      # -----------------------------
       # - name: ✅ SonarQube Quality Gate
       #   if: always()
       #   uses: SonarSource/sonarqube-quality-gate-action@v1
