@@ -1,0 +1,89 @@
+name: 🧪 PR Build & SonarQube Analysis
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  build-and-analyze:
+    name: Build, Test & Analyze
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # -----------------------------
+      # 1. Checkout repository
+      # -----------------------------
+      - name: 🛎️ Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for full Sonar blame info
+
+      # -----------------------------
+      # 2. Setup Node.js & pnpm
+      # -----------------------------
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: pnpm
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+          run_install: false
+
+      # -----------------------------
+      # 3. Install dependencies (cached)
+      # -----------------------------
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # -----------------------------
+      # 4. Run Vitest with coverage
+      # -----------------------------
+      - name: 🧪 Run Vitest tests
+        run: pnpm vitest run --coverage
+        env:
+          CI: true
+
+      # -----------------------------
+      # 5. Build project
+      # -----------------------------
+      - name: 🏗️ Build project
+        run: pnpm build
+
+      # -----------------------------
+      # 6. SonarQube Analysis
+      # -----------------------------
+      - name: 🔍 SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=vite-deploy
+            -Dsonar.projectName=vite-deploy
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.coverage.exclusions=**/*.test.*,**/__tests__/**,**/test/**
+            -Dsonar.sourceEncoding=UTF-8
+
+      # -----------------------------
+      # 7. Quality Gate check (optional but recommended)
+      # -----------------------------
+      - name: ✅ SonarQube Quality Gate
+        if: always()
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
